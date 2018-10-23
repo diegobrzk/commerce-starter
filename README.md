@@ -1,1 +1,1 @@
-# Project - Commerce Starter (ALL BASICS) #
+# COMMERCE STARTER - ALL BASICS FOR COMMERCE #
