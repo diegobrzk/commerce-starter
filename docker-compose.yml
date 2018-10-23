@@ -14,11 +14,24 @@ services:
     jenkins:
         image: jenkins
         ports:
-            - 8080:8080
-            - 5000:5000
+            - 8181:8181
+            - 5010:5010
 
     mongo:
         image: mongo
         ports:
             - 27017:27017
 
+    solr:
+        image: solr
+        ports:
+            - 8983:8983
+        volumes:
+            - data:/opt/solr/server/solr/mycores
+        entrypoint:
+            - docker-entrypoint.sh
+            - solr-precreate
+            - mycore
+
+volumes:
+    data:
