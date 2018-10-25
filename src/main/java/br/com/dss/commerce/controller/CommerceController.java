@@ -2,48 +2,38 @@ package br.com.dss.commerce.controller;
 
 
 import br.com.dss.commerce.dto.Cart;
-import br.com.dss.commerce.dto.Entry;
-import br.com.dss.commerce.dto.Product;
+import br.com.dss.commerce.service.CartService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static org.springframework.util.StringUtils.isEmpty;
+import java.util.concurrent.ExecutionException;
 
 @RestController("/cart")
 public class CommerceController {
 
-    // MOCKED INFORMATION:
-    private static final Integer ENTRY_QUANTITY = 3;
-    private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(39.99);
-
-    private static final String PRODUCT_NAME = "Dark Souls: Remastered - Nintendo Switch";
-    private static final String CART_CODE = "BR0001";
-    private static final String PRODUCT_DESCRIPTION =   "About the product\n" +
-                                                        "Deep and dark universe\n" +
-                                                        "Each end is a new Beginning\n" +
-                                                        "Gameplay richness and possibilities\n" +
-                                                        "Sense of learning, mastering and accomplishments\n" +
-                                                        "The way of the multiplayer (up to 6 players with dedicated servers)";
+    @Autowired
+    private CartService cartService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Cart retrieveCart(@RequestParam final String code) {
+    public Cart retrieveRandomCart() {
+        return cartService.getRandomCarts(100).get(0);
+    }
 
-        // This content is just a sample until the creation of mongodb structure.
+    @RequestMapping(value = "/parallel-stream", method = RequestMethod.GET)
+    public Cart retrieveRandomCartWithParallelStream() {
+        return cartService.getRandomCartsWithParallelStream(100).get(0);
+    }
 
-        if (isEmpty(code))
-            return new Cart();
+    @RequestMapping(value = "/simple-threads", method = RequestMethod.GET)
+    public Cart retrieveRandomCartWithSimpleThreads() {
+        return cartService.getRandomCartsWithSimpleThreads(100).get(0);
+    }
 
-        final Product product = new Product(code, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_PRICE);
-        final Entry entry = new Entry(product, ENTRY_QUANTITY);
-
-        final BigDecimal total = BigDecimal.valueOf(entry.getQuantity()).multiply(product.getPrice());
-
-        return new Cart(CART_CODE, total, List.of(entry));
+    @RequestMapping(value = "/thread-pool", method = RequestMethod.GET)
+    public Cart retrieveRandomCartWithThreadPool() throws ExecutionException, InterruptedException {
+        return cartService.getRandomCartsWithThreadPool(100).get(0);
     }
 
 }
